@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>📚 Manage Courses</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f9f9f9; }
+        h1 { color: darkblue; }
+        form { margin-bottom: 20px; }
+        input[type="text"] { padding: 8px; border-radius: 5px; border: 1px solid #ccc; }
+        button { padding: 8px 12px; margin-left: 5px; border-radius: 5px; border: none; background: darkblue; color: white; cursor: pointer; }
+        button:hover { background: navy; }
+        h3 { margin-top: 30px; }
+        select { padding: 8px; border-radius: 5px; border: 1px solid #ccc; width: 250px; }
+        option { padding: 5px; }
+        a { text-decoration: none; color: white; background: orange; padding: 8px 12px; border-radius: 5px; display: inline-block; margin-top: 20px; }
+        a:hover { background: darkorange; }
+    </style>
+</head>
+<body>
+    <h1>📚 Manage Courses</h1>
+
+    <!-- Form to Add New Course -->
+    <form method="POST">
+        <input type="text" name="course_name" placeholder="Enter new course" required>
+        <button type="submit">➕ Add Course</button>
+    </form>
+
+    <!-- Dropdown of Courses -->
+    <h3>Available Courses:</h3>
+    {% if courses %}
+        <select name="course">
+            {% for c in courses %}
+                <option value="{{ c }}">{{ c }}</option>
+            {% endfor %}
+        </select>
+    {% else %}
+        <p>No courses added yet.</p>
+    {% endif %}
+
+    <!-- Navigation -->
+    <a href="{{ url_for('home') }}">🏠 Back to Attendance</a>
+</body>
+</html>

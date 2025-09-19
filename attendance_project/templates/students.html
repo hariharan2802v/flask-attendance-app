@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>👨‍🎓 Manage Students</title>
+    <style>
+        body { font-family: Arial; margin: 20px; }
+        h1 { color: darkblue; }
+        ul { margin-top: 15px; }
+        li { margin: 8px 0; }
+        input, button { padding: 6px; margin: 5px; border-radius: 5px; border: 1px solid #ccc; }
+        button { cursor: pointer; }
+        .delete { background: red; color: white; }
+        .add { background: green; color: white; }
+        a { text-decoration: none; color: darkblue; margin-top: 20px; display: inline-block; }
+    </style>
+</head>
+<body>
+    <h1>👨‍🎓 Manage Students</h1>
+
+    <form method="POST">
+        <input type="text" name="add_student" placeholder="Enter new student" required>
+        <button type="submit" class="add">➕ Add Student</button>
+    </form>
+
+    <h3>Student List:</h3>
+    <ul>
+        {% for s in students %}
+        <li>
+            {{ s }}
+            <form method="POST" style="display:inline;">
+                <input type="hidden" name="delete_student" value="{{ s }}">
+                <button type="submit" class="delete">❌ Delete</button>
+            </form>
+        </li>
+        {% endfor %}
+    </ul>
+
+    <a href="{{ url_for('home') }}">🏠 Back to Attendance</a>
+</body>
+</html>

@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Homework Entry</title>
+    <style>
+        body {
+            font-family: "Segoe UI", Tahoma, sans-serif;
+            max-width: 950px;
+            margin: 30px auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #eef6ff, #f9f9f9);
+            color: #333;
+        }
+        h1 { color: #1e3d59; text-align: center; }
+        form {
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 0 12px rgba(0,0,0,0.15);
+            margin-bottom: 20px;
+            border-left: 6px solid #1abc9c;
+        }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; border-radius: 8px; overflow: hidden; }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: center; }
+        th { background-color: #34495e; color: white; }
+        tr:nth-child(even) { background-color: #f0f9ff; }
+        tr:nth-child(odd) { background-color: #fdf6ff; }
+
+        .marks-input {
+            width: 80px;
+            background: #fff8dc;
+            border: 1px solid #f39c12;
+            border-radius: 5px;
+            padding: 5px;
+        }
+        .progress-buttons { display: flex; gap: 5px; justify-content: center; }
+        .btn-completed {
+            background: #2ecc71; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer;
+        }
+        .btn-not {
+            background: #e74c3c; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer;
+        }
+        .tasks-input {
+            margin-top: 6px; display: none; width: 95%; border: 1px solid #2980b9;
+            border-radius: 4px; padding: 5px; background: #eaf2fb;
+        }
+        button {
+            margin-top: 15px; padding: 10px 18px;
+            background: linear-gradient(135deg, #1abc9c, #3498db);
+            color: white; border: none; border-radius: 6px;
+            cursor: pointer; font-size: 1em; font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        button:hover { background: linear-gradient(135deg, #16a085, #2980b9); transform: scale(1.05); }
+        #toggleRecordsBtn {
+            background: linear-gradient(135deg, #9b59b6, #8e44ad);
+        }
+        #toggleRecordsBtn:hover {
+            background: linear-gradient(135deg, #8e44ad, #6c3483);
+        }
+        .records-section {
+            background: #fefcff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 0 12px rgba(0,0,0,0.15);
+            margin-top: 20px;
+            border-left: 6px solid #9b59b6;
+        }
+        .no-records { font-style: italic; color: #888; }
+        .doubt-box {
+            margin-top: 20px;
+            padding: 15px;
+            background: #fff3cd;
+            border: 1px solid #ffeeba;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <h1>📘 Homework Entry for {{ current_date }}</h1>
+
+    <form method="POST">
+        <label><b>Date:</b></label>
+        <input type="date" name="date" required />
+
+        <label><b>Course:</b></label>
+        <select name="course" required>
+            {% for course in courses %}
+            <option value="{{ course }}">{{ course }}</option>
+            {% endfor %}
+        </select>
+
+        <label><b>Homework Description:</b></label>
+        <textarea name="description" rows="3" placeholder="Enter homework details..."></textarea>
+
+        <h3 style="color:blue;">🔑 Teacher Section</h3>
+        <input type="password" id="teacherPass" placeholder="Enter Teacher Password" />
+        <button type="button" onclick="enableMarks()">🔓 Unlock Marks</button>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Student</th>
+                    <th>Marks</th>
+                    <th>Exercism Progress</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for student in students %}
+            <tr>
+                <td><b>{{ student }}</b></td>
+                <td><input type="text" class="marks-input" name="{{ student }}_marks" placeholder="Marks" disabled /></td>
+                <td>
+                    <div class="progress-buttons">
+                        <button type="button" class="btn-completed" onclick="toggleTasks('{{ student }}')">✅ Completed</button>
+                        <button type="button" class="btn-not" onclick="hideTasks('{{ student }}')">❌ Not Completed</button>
+                    </div>
+                    <textarea class="tasks-input" id="tasks_{{ student }}" name="{{ student }}_progress" rows="2" placeholder="Enter completed tasks..."></textarea>
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="doubt-box">
+            <label><b>❓ Have any doubts?</b></label>
+            <textarea name="doubt" rows="3" placeholder="Ask your question here..."></textarea>
+        </div>
+
+        <button type="submit">✅ Save / Submit</button>
+    </form>
+
+    <button id="toggleRecordsBtn">📂 View Homework Records</button>
+
+    <div class="records-section" id="homeworkRecords" style="display: none;">
+        <h2>📑 Submitted Homework Records</h2>
+        {% if homework_records %}
+            {% for date, courses_dict in homework_records.items() %}
+                <h3 style="color:blue;">📅 Date: {{ date }}</h3>
+                {% for course, course_data in courses_dict.items() %}
+                    <h4 style="color:green;">📘 Course: {{ course }}</h4>
+                    {% if course_data.description %}
+                        <p><strong style="color:violet;">📝 Description:</strong> {{ course_data.description }}</p>
+                    {% endif %}
+                    <table>
+                        <thead>
+                            <tr style="background:orange; color:white;">
+                                <th>Student</th>
+                                <th>Marks</th>
+                                <th>Exercism Progress</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for student, mark in course_data.marks.items() %}
+                            <tr>
+                                <td>{{ student }}</td>
+                                <td style="color:blue;">{{ mark }}</td>
+                                <td style="color:green;">{{ course_data.progress.get(student, "Not Updated") }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% endfor %}
+            {% endfor %}
+        {% else %}
+            <p class="no-records">No homework records submitted yet.</p>
+        {% endif %}
+    </div>
+
+    <script>
+        function toggleTasks(student) {
+            document.getElementById("tasks_" + student).style.display = "block";
+        }
+        function hideTasks(student) {
+            document.getElementById("tasks_" + student).style.display = "none";
+        }
+        function enableMarks() {
+            const pass = document.getElementById("teacherPass").value;
+            if (pass === "teacher123") {
+                document.querySelectorAll(".marks-input").forEach(el => el.disabled = false);
+                alert("✅ Marks unlocked for teacher!");
+            } else {
+                alert("❌ Wrong password!");
+            }
+        }
+        const btn = document.getElementById('toggleRecordsBtn');
+        const recordsDiv = document.getElementById('homeworkRecords');
+        btn.addEventListener('click', () => {
+            if (recordsDiv.style.display === 'none') {
+                recordsDiv.style.display = 'block';
+                btn.textContent = '📂 Hide Homework Records';
+            } else {
+                recordsDiv.style.display = 'none';
+                btn.textContent = '📂 View Homework Records';
+            }
+        });
+    </script>
+</body>
+</html>

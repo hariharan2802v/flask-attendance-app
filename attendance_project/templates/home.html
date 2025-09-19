@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>📋 Mark Attendance</title>
+    <style>
+        body { font-family: Arial; margin: 20px; }
+        h1 { color: darkblue; }
+        .present { color: green; font-weight: bold; }
+        .absent { color: red; font-weight: bold; }
+        table { border-collapse: collapse; width: 80%; margin-top: 20px; }
+        th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
+        th { background: #f2f2f2; }
+        button { margin: 5px; padding: 8px 15px; border: none; border-radius: 6px; cursor: pointer; }
+        .btn-green { background: green; color: white; }
+        .btn-red { background: red; color: white; }
+        .btn-blue { background: blue; color: white; }
+        .btn-nav {
+            background: darkorange;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 6px;
+            text-decoration: none;
+            margin: 2px;
+            display: inline-block;
+        }
+        .btn-nav:hover { opacity: 0.8; }
+        .section-title { margin-top: 40px; color: darkslategray; }
+        .course-title { color: darkgreen; margin-top: 10px; }
+        .student-bubble {
+            display: inline-block;
+            background-color: #e0f7fa;
+            padding: 8px 15px;
+            margin: 5px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>📋 Mark Attendance</h1>
+    <p>Date: {{ current_date }}</p>
+
+    <!-- ✅ Attendance Form with Student Bubbles -->
+    <form method="POST">
+        {% for student in students %}
+            <div class="student-bubble">
+                {{ student }}
+                <select name="{{ student }}">
+                    <option value="P" {% if attendance.get(student) == 'P' %}selected{% endif %}>Present ✅</option>
+                    <option value="A" {% if attendance.get(student) == 'A' %}selected{% endif %}>Absent ❌</option>
+                </select>
+                <a href="{{ url_for('student_detail', name=student) }}">🔍</a>
+            </div>
+        {% endfor %}
+
+        <br>
+        <button type="submit" class="btn-blue">✔ Submit Attendance</button>
+        <button type="button" class="btn-green" onclick="markAll('P')">Mark All Present</button>
+    </form>
+
+    <!-- ✅ Current Attendance Summary Table -->
+    <h2 class="section-title">📊 Current Attendance</h2>
+    <table>
+        <tr>
+            <th>Student</th>
+            <th>Status</th>
+        </tr>
+        {% for s in students %}
+        <tr>
+            <td><a href="{{ url_for('student_detail', name=s) }}">{{ s }}</a></td>
+            <td>
+                {% if attendance.get(s) == "P" %}
+                    <span class="present">Present ✅</span>
+                {% elif attendance.get(s) == "A" %}
+                    <span class="absent">Absent ❌</span>
+                {% else %}
+                    Not Marked
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <!-- ✅ Summary -->
+    <h3>📊 Summary</h3>
+    <p>✔ Present: {{ present_count }}  
+       ❌ Absent: {{ absent_count }}  
+       👥 Total: {{ students|length }}</p>
+
+    <!-- ✅ Past Attendance Links -->
+    <h3>📅 Past Records</h3>
+    <ul>
+        {% for date in attendance_history.keys() %}
+            <li><a href="{{ url_for('view_attendance', date=date) }}">{{ date }}</a></li>
+        {% endfor %}
+    </ul>
+
+    <!-- ✅ Navigation Buttons -->
+    <h3>⚙️ Navigation</h3>
+    <p>
+        <a href="{{ url_for('manage_students') }}" class="btn-nav">👨‍🎓 Manage Students</a>
+        <a href="{{ url_for('manage_courses') }}" class="btn-nav">📚 Manage Courses</a>
+        <a href="{{ url_for('homework') }}" class="btn-nav">📝 Enter Homework</a>
+        <a href="{{ url_for('view_attendance_records') }}" class="btn-nav">📅 View Attendance Records</a>
+        <a href="{{ url_for('front') }}" class="btn-nav">🏠 Front Page</a>
+    </p>
+
+    <!-- ✅ Homework Records -->
+    <h2 class="section-title">📝 Homework Records</h2>
+    {% if homework_records %}
+        {% for date, course_data in homework_records.items() %}
+            <h3>{{ date }}</h3>
+            {% for course, data in course_data.items() %}
+                <div class="course-title"><strong>📚 Course:</strong> {{ course }}</div>
+                <table>
+                    <tr>
+                        <th>S.No</th>
+                        <th>Student</th>
+                        <th>Marks</th>
+                    </tr>
+                    {% for i, student in enumerate(students, start=1) %}
+                        <tr>
+                            <td>{{ i }}</td>
+                            <td>{{ student }}</td>
+                            <td>{{ data.marks.get(student, 'N/A') }}</td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            {% endfor %}
+        {% endfor %}
+    {% else %}
+        <p>No homework records found.</p>
+    {% endif %}
+
+    <!-- ✅ JS: Mark All Present -->
+    <script>
+        function markAll(value) {
+            const selects = document.querySelectorAll("select");
+            selects.forEach(sel => sel.value = value);
+        }
+    </script>
+
+</body>
+</html>

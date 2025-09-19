@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>📅 Attendance Records</title>
+    <style>
+        body {
+            font-family: Arial;
+            margin: 20px;
+        }
+        h1 {
+            color: darkblue;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+        li {
+            margin: 10px 0;
+            font-size: 18px;
+        }
+        a {
+            text-decoration: none;
+            color: #007BFF;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .btn-nav {
+            background: darkorange;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 6px;
+            text-decoration: none;
+            margin-top: 20px;
+            display: inline-block;
+        }
+        .btn-nav:hover {
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>📅 Attendance Records</h1>
+
+    {% if dates %}
+        <ul>
+            {% for date in dates %}
+                <li>📌 <a href="{{ url_for('view_attendance', date=date) }}">{{ date }}</a></li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No attendance records found.</p>
+    {% endif %}
+
+    <a href="{{ url_for('front') }}" class="btn-nav">🏠 Back to Front Page</a>
+
+</body>
+</html>
