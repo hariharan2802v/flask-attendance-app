@@ -11,6 +11,14 @@ courses = ["Software Engineering", "Maths", "Data Structure", "Hindhi", "Informa
 attendance_history = {}
 homework_records = {}
 
+@app.template_filter('dateformat')
+def dateformat(value, format="%Y-%m-%d"):
+    try:
+        return datetime.strptime(value, "%d-%m-%Y").strftime(format)
+    except:
+        return datetime.now().strftime(format)
+
+
 # ✅ Redirect "/" and "/registeri" to front page
 @app.route("/", methods=["GET", "POST"])
 @app.route("/registeri", methods=["GET", "POST"])
@@ -25,28 +33,37 @@ def front():
 # ✅ Attendance marking logic now in this route
 @app.route("/mark", methods=["GET", "POST"])
 def mark_attendance():
-    current_date = datetime.now().strftime("%d-%m-%Y")
-
     if request.method == "POST":
-        if current_date not in attendance_history:
-            attendance_history[current_date] = {}
+        selected_date = request.form.get("date")
+        if not selected_date:
+            selected_date = datetime.now().strftime("%d-%m-%Y")
+        else:
+            selected_date = datetime.strptime(selected_date, "%Y-%m-%d").strftime("%d-%m-%Y")
+        
+        if selected_date not in attendance_history:
+            attendance_history[selected_date] = {}
+
         for s in students:
             status = request.form.get(s, "A")
-            attendance_history[current_date][s] = status
+            attendance_history[selected_date][s] = status
 
-    today_attendance = attendance_history.get(current_date, {})
+    else:
+        selected_date = datetime.now().strftime("%d-%m-%Y")
 
+    today_attendance = attendance_history.get(selected_date, {})
     present_count = sum(1 for s in today_attendance.values() if s == "P")
     absent_count = sum(1 for s in today_attendance.values() if s == "A")
 
     return render_template("home.html",
                            students=students,
                            attendance=today_attendance,
-                           current_date=current_date,
+                           current_date=selected_date,
                            present_count=present_count,
                            absent_count=absent_count,
                            attendance_history=attendance_history,
-                           courses=courses)
+                           courses=courses,
+                           homework_records=homework_records)
+
 
 @app.route("/student/<name>")
 def student_detail(name):
