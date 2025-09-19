@@ -39,10 +39,14 @@
 <body>
 
     <h1>📋 Mark Attendance</h1>
-    <p>Date: {{ current_date }}</p>
 
-    <!-- ✅ Attendance Form with Student Bubbles -->
+    <!-- ✅ Date Selector -->
     <form method="POST">
+        <label for="date">📅 Select Date:</label>
+        <input type="date" name="date" required value="{{ current_date | dateformat }}">
+        <br><br>
+
+        <!-- ✅ Attendance Form with Student Bubbles -->
         {% for student in students %}
             <div class="student-bubble">
                 {{ student }}
@@ -58,6 +62,8 @@
         <button type="submit" class="btn-blue">✔ Submit Attendance</button>
         <button type="button" class="btn-green" onclick="markAll('P')">Mark All Present</button>
     </form>
+
+    <p>Date Selected: {{ current_date }}</p>
 
     <!-- ✅ Current Attendance Summary Table -->
     <h2 class="section-title">📊 Current Attendance</h2>
